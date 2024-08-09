@@ -137,16 +137,6 @@ export default function ForgotPasswordModal({ isOpen, onOpenChange, usernameData
                                     <>
                                         <Input
                                             size={'sm'}
-                                            type="password"
-                                            label="Mật khẩu mới"
-                                            isRequired
-                                            isInvalid={passwordInvalid}
-                                            errorMessage="Nhập mật khẩu"
-                                            value={password}
-                                            onValueChange={setPassword}
-                                        />
-                                        <Input
-                                            size={'sm'}
                                             type="text"
                                             label="Mã xác nhận"
                                             isRequired
@@ -162,6 +152,16 @@ export default function ForgotPasswordModal({ isOpen, onOpenChange, usernameData
                                         ) : (
                                             <></>
                                         )}
+                                        <Input
+                                            size={'sm'}
+                                            type="password"
+                                            label="Mật khẩu mới"
+                                            isRequired
+                                            isInvalid={passwordInvalid}
+                                            errorMessage="Nhập mật khẩu"
+                                            value={password}
+                                            onValueChange={setPassword}
+                                        />
                                     </>
                                 ) : (
                                     <></>
