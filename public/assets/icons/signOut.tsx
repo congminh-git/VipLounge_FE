@@ -1,22 +1,17 @@
-interface ISignOutSVG {
-    className?: string;
-}
-
-export const SignOutSVG: React.FC<ISignOutSVG> = ({ className }) => {
+export const SignOutSVG = (props: React.JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>) => {
     return (
         <svg
-            className={`${className} w-6 h-6 text-gray-800 dark:text-white`}
-            aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
-            viewBox="0 0 18 16"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            {...props}
         >
             <path
-                stroke="currentColor"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth="2"
-                d="M1 8h11m0 0L8 4m4 4-4 4m4-11h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-3"
+                d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"
             />
         </svg>
     );

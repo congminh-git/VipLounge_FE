@@ -23,7 +23,6 @@ const usePersistedAuth = () => {
             dispatch(setUserToken(token));
         }
 
-        console.log(permissions);
         if (permissions) {
             dispatch(setUserPermissions(JSON.parse(permissions)));
         }

@@ -16,7 +16,7 @@ import ForgotPasswordModal from '@/components/modals/forgotPasswordModals/forgot
 export default function Home() {
     const router = useRouter();
     const dispatch = useDispatch();
-    const [username, setUsername] = useState('user1');
+    const [username, setUsername] = useState('vjadmin');
     const [password, setPassword] = useState('A12345');
     const [usernameInvalid, setUsernameInvalid] = useState(false);
     const [passwordInvalid, setPasswordInvalid] = useState(false);
@@ -87,9 +87,9 @@ export default function Home() {
     }, [username]);
 
     return (
-        <div className="w-screen h-screen flex justify-end">
-            <div className="h-full mr-16 flex items-center">
-                <Card>
+        <div className="w-screen h-screen flex sm:justify-end justify-center">
+            <div className="h-full w-full p-4 sm:p-0 sm:w-fit sm:mr-16 flex items-center">
+                <Card className="w-full">
                     <CardBody>
                         <div className="p-2">
                             <div className="grid gap-2">

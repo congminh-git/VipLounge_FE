@@ -59,8 +59,8 @@ interface ICustomTable {
     dateRange?: RangeValue<DateValue>;
     setDateRange?: (dateRange: RangeValue<DateValue>) => void;
     actions?: string[];
-    deleteFunc?: (id: number) => Promise<void>;
-    activeFunc?: (id: number) => Promise<void>;
+    deleteFunc?: (id: string) => Promise<void>;
+    activeFunc?: (id: string) => Promise<void>;
     openChangePassword?: (bool: boolean) => void;
     onOpenAddModal?: (bool: boolean) => void;
     onOpenUpdateModal?: (bool: boolean) => void;
@@ -128,7 +128,7 @@ export default function CustomTable({
     const [searchValue, setSearchValue] = useState('');
     const [page, setPage] = useState(1);
     const [pages, setPages] = useState(1);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [rowsPerPage, setRowsPerPage] = useState(15);
     const [columnFilter, setColumnFilter] = useState<string>('');
     const [agencies, setAgencies] = useState([]);
     const [airports, setAirports] = useState([]);
@@ -142,7 +142,6 @@ export default function CustomTable({
     const configServiceName: Record<Service, string> = {
         lounge: 'Phòng chờ',
         connecting_flight: 'Nối chuyến',
-        master: 'Tất cả dịch vụ',
     };
 
     const fetchDataAgenciesForFormat = async () => {
@@ -185,7 +184,7 @@ export default function CustomTable({
                             <Tooltip content="Edit">
                                 <button
                                     onClick={() => {
-                                        setSelectedId(item.id.toString());
+                                        setSelectedId(item.id ? item.id.toString() : item.key);
                                         onOpenUpdateModal(true);
                                     }}
                                     className="text-lg text-default-400 cursor-pointer active:opacity-50"
@@ -259,7 +258,7 @@ export default function CustomTable({
             } else if (key === 'agencyCode') {
                 const agency: any = agencies.find((agency) => agency.code === cellValue);
                 return <span style={cellStyle}>{agency?.name}</span>;
-            } else if (key === 'airportCode') {
+            } else if (key === 'airportCode' && airports.length > 0) {
                 const airport: any = airports.find((airport) => airport.code === cellValue);
                 return <span style={cellStyle}>{airport?.name}</span>;
             } else {
@@ -272,18 +271,6 @@ export default function CustomTable({
     const bottomContent = React.useMemo(() => {
         return (
             <div className="py-2 px-2 flex justify-between items-center">
-                <label className="flex items-center text-default-400 text-small">
-                    Rows per page:
-                    <select
-                        className="bg-transparent outline-none text-default-400 text-small border ml-2"
-                        onChange={onRowsPerPageChange}
-                    >
-                        <option value="10">10</option>
-                        <option value="15">15</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                    </select>
-                </label>
                 <Pagination
                     showControls
                     classNames={{
@@ -295,6 +282,17 @@ export default function CustomTable({
                     variant="light"
                     onChange={setPage}
                 />
+                <label className="flex items-center text-default-400 text-small">
+                    Rows per page:
+                    <select
+                        className="bg-transparent outline-none text-default-400 text-small border ml-2"
+                        onChange={onRowsPerPageChange}
+                    >
+                        <option value="15">15</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                    </select>
+                </label>
             </div>
         );
     }, [page, pages]);
@@ -311,12 +309,26 @@ export default function CustomTable({
 
     return (
         <div>
-            <div className="flex justify-between items-center mb-2">
+            <div className="flex justify-end items-center mb-2">
+                {hasExport ? (
+                    <ExportButton
+                        data={data.filter((element: any) =>
+                            (element[filterByColumn.column] ? element[filterByColumn.column] : '').includes(
+                                columnFilter,
+                            ),
+                        )}
+                        permissions={userPermissons}
+                    />
+                ) : (
+                    <></>
+                )}
+            </div>
+            <div className="sm:flex justify-between items-center mb-2">
                 {hasSearch ? (
                     <Input
                         isClearable
                         classNames={{
-                            base: `w-full sm:max-w-[40%]`,
+                            base: `w-full sm:max-w-[40%] mb-2 sm:mb-0`,
                             inputWrapper: 'border-1',
                         }}
                         placeholder={`Search by ${searchBy}...`}
@@ -330,14 +342,18 @@ export default function CustomTable({
                 ) : (
                     <div></div>
                 )}
-                <div className="flex justify-center items-center">
+                <div
+                    className={`flex ${
+                        hasAddNew && !hasFilterByColumn && !setDateRange ? 'justify-end' : 'justify-center'
+                    } items-center`}
+                >
                     {hasFilterByColumn ? (
                         <Autocomplete
                             // label={`Lọc bằng ${filterByColumn.name}`}
                             placeholder={`Lọc bằng ${filterByColumn.name}`}
                             size="md"
                             defaultItems={dataOfFilter}
-                            className="w-full ml-4"
+                            className="w-full sm:ml-4"
                             onInputChange={setColumnFilter}
                         >
                             {(element: any) => <AutocompleteItem key={element.code}>{element.code}</AutocompleteItem>}
@@ -383,15 +399,13 @@ export default function CustomTable({
                             svgIcon={<PlusIcon />}
                             size="md"
                             message="Thêm mới"
+                            fullWidth={false}
                             handleClick={() => onOpenAddModal(true)}
                         />
                     ) : (
                         <></>
                     )}
                 </div>
-            </div>
-            <div className="flex justify-end items-center mb-2">
-                {hasExport ? <ExportButton data={data} permissions={userPermissons} /> : <></>}
             </div>
             <div className="">
                 <Table isStriped aria-label="Custom table" bottomContent={bottomContent}>

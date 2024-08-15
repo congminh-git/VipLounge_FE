@@ -14,7 +14,7 @@ export default function HomePageLayout({ children }: { children: React.ReactNode
             <section>
                 <Headers />
                 <SideBar />
-                <div className="pt-24 w-screen h-screen box-border">{children}</div>
+                <div className="pt-24 w-screen min-h-screen box-border">{children}</div>
                 <Footer />
             </section>
         );

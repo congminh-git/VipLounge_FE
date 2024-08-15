@@ -8,14 +8,13 @@ import { ExportIcon } from '../../public/assets/icons/exportIcon';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { useEffect, useState } from 'react';
-import { getAgencies, getServiceOptions } from '@/services/agency';
+import { getAgencies } from '@/services/agency';
 
 export default function ExportButton({ data, permissions }: any) {
     const [historyViewPermission, setHistoryViewPermission] = useState();
     const [agency, setAgency] = useState<string>();
     const [serviceOption, setServiceOption] = useState<string>();
     const [listAgencies, setListAgencies] = useState([]);
-    const [listServiceOptions, setListServiceOptions] = useState([]);
     const agencyName = useSelector((state: RootState) => state.auth.agencyName);
     const agencyCode = useSelector((state: RootState) => state.auth.agencyCode);
 
@@ -125,11 +124,6 @@ export default function ExportButton({ data, permissions }: any) {
         setListAgencies(result);
     };
 
-    const fetchServiceOptions = async (agency: string) => {
-        const result = await getServiceOptions(agency);
-        setListServiceOptions(result);
-    };
-
     useEffect(() => {
         if (permissions) {
             const historyView = (typeof permissions === 'string' ? JSON.parse(permissions) : permissions).find(
@@ -141,12 +135,6 @@ export default function ExportButton({ data, permissions }: any) {
     }, [permissions]);
 
     useEffect(() => {
-        if (agency) {
-            fetchServiceOptions(agency);
-        }
-    }, [agency]);
-
-    useEffect(() => {
         if (agencyCode) {
             if (permissions.includes('HISTORY_VIEW_AGENCY_OWNED')) {
                 setAgency(agencyCode);
@@ -156,42 +144,6 @@ export default function ExportButton({ data, permissions }: any) {
 
     return (
         <div className="flex items-center">
-            {historyViewPermission === 'HISTORY_VIEW_ALL' ? (
-                <>
-                    <Autocomplete
-                        placeholder={`Đại lý`}
-                        size="md"
-                        defaultItems={listAgencies}
-                        className="mr-4"
-                        onInputChange={setAgency}
-                    >
-                        {(element: any) => <AutocompleteItem key={element.code}>{element.code}</AutocompleteItem>}
-                    </Autocomplete>
-                    <Autocomplete
-                        placeholder={`Dịch vụ`}
-                        size="md"
-                        defaultItems={listServiceOptions}
-                        className="mr-4"
-                        onInputChange={setServiceOption}
-                    >
-                        {(element: any) => <AutocompleteItem key={element.code}>{element.code}</AutocompleteItem>}
-                    </Autocomplete>
-                </>
-            ) : historyViewPermission === 'HISTORY_VIEW_AGENCY_OWNED' ? (
-                <>
-                    <Autocomplete
-                        placeholder={`Dịch vụ`}
-                        size="md"
-                        defaultItems={listServiceOptions}
-                        className="mr-4"
-                        onInputChange={setServiceOption}
-                    >
-                        {(element: any) => <AutocompleteItem key={element.code}>{element.code}</AutocompleteItem>}
-                    </Autocomplete>
-                </>
-            ) : (
-                <></>
-            )}
             <ButtonVJ
                 className={`bg-foreground text-background flex`}
                 size="md"

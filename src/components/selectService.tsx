@@ -13,7 +13,6 @@ export default function SelectService({ defaultValue, setData }: ISelectService)
     const services = [
         { key: 'lounge', name: 'Phòng chờ' },
         { key: 'connecting_flight', name: 'Dịch vụ nối chuyến' },
-        { key: 'master', name: 'Tất cả dịch vụ' },
     ];
     return (
         <Select

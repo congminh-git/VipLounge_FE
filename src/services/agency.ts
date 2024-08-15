@@ -5,18 +5,13 @@ export const getAgencies = async () => {
     return getRequest(url);
 };
 
-export const getServiceOptions = async (agency: string) => {
-    const url = `/agency/serviceOptions?agency=${agency}`;
+export const getAgencyByKey = async (key: string) => {
+    const url = `/agency/${key}`;
     return getRequest(url);
 };
 
-export const getAgencyById = async (id: string) => {
-    const url = `/agency/${id}`;
-    return getRequest(url);
-};
-
-export const deleteAgencyById = async (id: string) => {
-    const url = `/agency/${id}`;
+export const deleteAgencyByKey = async (key: string) => {
+    const url = `/agency/${key}`;
     return deleteRequest(url);
 };
 
@@ -25,12 +20,12 @@ export const addAgency = async (data: any) => {
     return postRequest(url, data);
 };
 
-export const updateAgencyById = async (id: string, data: any) => {
-    const url = `/agency/update/${id}`;
+export const updateAgencyByKey = async (key: string, data: any) => {
+    const url = `/agency/update/${key}`;
     return putRequest(url, data);
 };
 
-export const activeAgencyById = async (id: string) => {
-    const url = `/agency/active/${id}`;
+export const activeAgencyByKey = async (key: string) => {
+    const url = `/agency/active/${key}`;
     return putRequest(url);
 };

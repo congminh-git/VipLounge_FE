@@ -3,11 +3,8 @@
 import withAuth from '@/hoc/withAuth';
 import CustomTable from '@/components/table';
 import { useEffect, useState } from 'react';
-import Swal from 'sweetalert2';
-import { getAirports } from '@/services/airport';
 import { getAgencies } from '@/services/agency';
-import { IAgency } from '@/types/Agency';
-import { getAllServiceHistory } from '@/services/check';
+import { getAllServiceHistory } from '@/services/history';
 import { CalendarDate, DateValue, getLocalTimeZone, today } from '@internationalized/date';
 import { RangeValue } from '@nextui-org/react';
 import { useSelector } from 'react-redux';
@@ -70,9 +67,7 @@ function History() {
 
     const fetchAgencies = async () => {
         const result = await getAgencies();
-        setListAgencies(
-            result.filter((item: IAgency) => item.service === 'master' || item.service === 'connecting_flight'),
-        );
+        setListAgencies(result);
     };
 
     const formatDateTime = (dateTime: string): string => {
@@ -124,16 +119,17 @@ function History() {
     }, [minSearchDate, maxSearchDate]);
 
     return (
-        <div className="p-16 pt-12">
+        <div className="p-1 pt-10 sm:p-16 sm:pt-12">
             <CustomTable
                 data={formatedData}
                 columns={columns}
                 searchBy={'pnr'}
                 hasAddNew={true}
-                hasFilterByColumn={false}
+                hasFilterByColumn={true}
                 hasExport={true}
                 dateSearchData={'checkTime'}
                 dataOfFilter={listAgencies}
+                filterByColumn={{ column: 'agencyCode', name: 'Đối tác' }}
                 dateRange={dateRange}
                 setDateRange={setDataRange}
                 minDaterange={minDate}

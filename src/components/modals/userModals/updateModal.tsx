@@ -70,18 +70,12 @@ export default function UpdateModal({ isOpen, onOpenChange, reFetchData, id }: I
     const [agencyCode, setAgencyCode] = useState<string>('');
     const [agencyCodeInvalid, setAgencyCodeInvalid] = useState<boolean>(false);
     const [service, setService] = useState<string>('');
-    const [serviceInvalid, setServiceInvalid] = useState<boolean>(false);
     const [serviceOption, setServiceOption] = useState<string>('');
-    const [serviceOptionValue, setServiceOptionValue] = useState<string>('');
-    const [serviceOptionInvalid, setServiceOptionInvalid] = useState<boolean>(false);
-    const [listServiceOptions, setListServiceOptions] = useState<any[]>([]);
-    const [role, setRole] = useState<string>('STAFF');
+    const [role, setRole] = useState<string>('PARTNER');
     const [roleInvalid, setRoleInvalid] = useState<boolean>(false);
     const [permission, setPermission] = useState<string[]>([]);
     const [permissionNotFilter, setPermissionNotFilter] = useState<string[]>([]);
     const [permissionInvalid, setPermissionInvalid] = useState<boolean>(false);
-    const [disableLounge, setDisableLounge] = useState<boolean>(false);
-    const [disableConnectingFlight, setDisableConnectingFlight] = useState<boolean>(false);
 
     const fetchAgencies = async () => {
         const result = await getAgencies();
@@ -128,20 +122,10 @@ export default function UpdateModal({ isOpen, onOpenChange, reFetchData, id }: I
         }
 
         {
-            if (role === 'STAFF') {
+            if (role === 'PARTNER') {
                 if (!agencyCode || agencyCode.trim() === '') {
                     agencyCodeInvalidBool = true;
                     setAgencyCodeInvalid(true);
-                }
-
-                if (!service || service.trim() === '') {
-                    serviceInvalidBool = true;
-                    setServiceInvalid(true);
-                }
-
-                if (!serviceOption || serviceOption.trim() === '') {
-                    serviceOptionInvalidBool = true;
-                    setServiceOptionInvalid(true);
                 }
             }
         }
@@ -165,12 +149,12 @@ export default function UpdateModal({ isOpen, onOpenChange, reFetchData, id }: I
             !roleInvalidBool &&
             !permissionInvalidBool
         ) {
+            const agency: any = listAgencies.find((element: IAgency) => element.code === agencyCode);
             const body: IUpdate = {
-                // password: password,
                 name: fullName,
                 phone: phone,
                 agencyCode: agencyCode,
-                service: service,
+                service: agency.service,
                 serviceOption: serviceOption,
                 roleName: role,
                 permissions: JSON.stringify(permission),
@@ -246,25 +230,21 @@ export default function UpdateModal({ isOpen, onOpenChange, reFetchData, id }: I
                 } else {
                     setPermission(permissionNotFilter);
                 }
+            } else {
+                setPermission(permissionNotFilter);
             }
         }
     }, [permissionNotFilter]);
 
     useEffect(() => {
         const regex = /\(([^)]+)\)/;
-        if (serviceOptionValue) {
-            const match = serviceOptionValue.match(regex);
-            if (match) {
-                setServiceOption(match[1]);
-            }
-        }
         if (agencyValue) {
             const match = agencyValue.match(regex);
             if (match) {
                 setAgencyCode(match[1]);
             }
         }
-    }, [serviceOptionValue, agencyValue]);
+    }, [agencyValue]);
 
     useEffect(() => {
         const agencyElement = document.querySelector('.agency-');
@@ -278,22 +258,6 @@ export default function UpdateModal({ isOpen, onOpenChange, reFetchData, id }: I
     }, [agencyCode]);
 
     useEffect(() => {
-        if (agencyCode) {
-            // setService('');
-            const agency: any = listAgencies.find((element: IAgency) => element.code === agencyCode);
-            if (agency) {
-                setDisableLounge(agency.service === 'master' || agency.service === 'lounge' ? false : true);
-                setDisableConnectingFlight(
-                    agency.service === 'master' || agency.service === 'connecting_flight' ? false : true,
-                );
-            } else {
-                setDisableLounge(true);
-                setDisableConnectingFlight(true);
-            }
-        }
-    }, [agencyCode]);
-
-    useEffect(() => {
         if (role && listRoles) {
             const element: any = listRoles.find((element: IRole) => element.roleName === role);
             if (element) {
@@ -301,16 +265,6 @@ export default function UpdateModal({ isOpen, onOpenChange, reFetchData, id }: I
             }
         }
     }, [role, listRoles]);
-
-    useEffect(() => {
-        if (agencyCode && listAgencies && service) {
-            const agency: any = listAgencies.find((element: IAgency) => element.code === agencyCode);
-            if (agency) {
-                setListServiceOptions(agency[service === 'lounge' ? 'lounges' : 'cfroms']);
-                console.log(agencyCode, agency[service === 'lounge' ? 'lounges' : 'cfroms']);
-            }
-        }
-    }, [agencyCode, service, listAgencies]);
 
     useEffect(() => {
         if (id && parseInt(id) > 0) {
@@ -335,6 +289,7 @@ export default function UpdateModal({ isOpen, onOpenChange, reFetchData, id }: I
             <Modal
                 backdrop="opaque"
                 isOpen={isOpen}
+                placement="center"
                 onOpenChange={onOpenChange}
                 size={'3xl'}
                 classNames={{
@@ -346,8 +301,8 @@ export default function UpdateModal({ isOpen, onOpenChange, reFetchData, id }: I
                         <>
                             <ModalHeader className="flex flex-col gap-1">Cập nhật tài khoản</ModalHeader>
                             <ModalBody>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="border rounded-md p-2">
+                                <div className="grid sm:grid-cols-2 gap-4 overflow-y-auto">
+                                    <div className="sm:border rounded-md sm:p-2">
                                         <Input
                                             size={'sm'}
                                             type="text"
@@ -370,10 +325,10 @@ export default function UpdateModal({ isOpen, onOpenChange, reFetchData, id }: I
                                         />
                                         <Autocomplete
                                             key={agencyCode}
-                                            label="Đại lý"
+                                            label="Đối tác"
                                             isRequired
                                             defaultItems={listAgencies}
-                                            errorMessage={'Chọn đại lý'}
+                                            errorMessage={'Chọn đối tác'}
                                             isInvalid={agencyCodeInvalid}
                                             className={`w-full agency-${agencyCode}`}
                                             onInputChange={setAgencyValue}
@@ -385,66 +340,8 @@ export default function UpdateModal({ isOpen, onOpenChange, reFetchData, id }: I
                                                 >{`${element.name} (${element.code})`}</AutocompleteItem>
                                             )}
                                         </Autocomplete>
-                                        <RadioGroup
-                                            key={service}
-                                            className={`service-${service}`}
-                                            isRequired
-                                            onValueChange={setService}
-                                            value={service}
-                                            isInvalid={serviceInvalid}
-                                            label="Dịch vụ"
-                                            orientation="horizontal"
-                                        >
-                                            <Radio isDisabled={disableLounge} value="lounge" className="mr-2">
-                                                Phòng chờ
-                                            </Radio>
-                                            <Radio isDisabled={disableConnectingFlight} value="connecting_flight">
-                                                Nối chuyến
-                                            </Radio>
-                                        </RadioGroup>
-                                        {service && agencyCode ? (
-                                            listServiceOptions.length > 0 && listAgencies ? (
-                                                <Autocomplete
-                                                    key={serviceOption}
-                                                    label={`${
-                                                        service === 'lounge' ? 'Phòng chờ' : 'Dịch vụ nối chuyến'
-                                                    }`}
-                                                    isRequired
-                                                    defaultItems={listServiceOptions}
-                                                    errorMessage={'Chọn dịch vụ'}
-                                                    isInvalid={serviceOptionInvalid}
-                                                    className={`w-full mt-2 service-option-${serviceOption}`}
-                                                    onInputChange={setServiceOptionValue}
-                                                    defaultSelectedKey={serviceOption}
-                                                >
-                                                    {(element: IAgency) => (
-                                                        <AutocompleteItem
-                                                            key={element.code}
-                                                        >{`${element.name} (${element.code})`}</AutocompleteItem>
-                                                    )}
-                                                </Autocomplete>
-                                            ) : (
-                                                <Autocomplete
-                                                    label={`${
-                                                        service === 'lounge' ? 'Phòng chờ' : 'Dịch vụ nối chuyến'
-                                                    }`}
-                                                    isRequired
-                                                    errorMessage={
-                                                        service === 'lounge'
-                                                            ? 'Đại lý chưa có dịch vụ phòng chờ'
-                                                            : 'Đại lý chưa có dịch vụ nối chuyến'
-                                                    }
-                                                    isInvalid={true}
-                                                    className={`w-full mt-2 service-option-${serviceOption}`}
-                                                >
-                                                    <AutocompleteItem key={'error'}>-----</AutocompleteItem>
-                                                </Autocomplete>
-                                            )
-                                        ) : (
-                                            <></>
-                                        )}
                                     </div>
-                                    <div className="h-full flex flex-col">
+                                    <div className="h-full flex sm:flex-col">
                                         <RadioGroup
                                             isRequired
                                             onValueChange={setRole}
@@ -459,10 +356,10 @@ export default function UpdateModal({ isOpen, onOpenChange, reFetchData, id }: I
                                             <Radio value="HDQ" className="mr-2">
                                                 HDQ
                                             </Radio>
-                                            <Radio value="STAFF">STAFF</Radio>
+                                            <Radio value="PARTNER">PARTNER</Radio>
                                         </RadioGroup>
-                                        <div className="bg-gray-50 rounded-md w-full border shadow-inner mt-2 p2 box-content flex-grow">
-                                            <div className="w-full h-full relative">
+                                        <div className="bg-gray-50 rounded-md w-full border shadow-inner mt-2 p2 box-content sm:flex-grow">
+                                            <div className="w-full h-full relative overflow-auto">
                                                 <CheckboxGroup
                                                     isDisabled={role ? false : true}
                                                     isInvalid={permissionInvalid}
