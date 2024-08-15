@@ -79,6 +79,7 @@ const withAuth = (WrappedComponent: ComponentType<any>) => {
             } else {
                 router.push('/login');
             }
+            // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [token, router, pathname, permissions]);
 
         return <WrappedComponent {...props} />;

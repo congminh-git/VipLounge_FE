@@ -154,119 +154,124 @@ export default function CustomTable({
         setAirports(result);
     };
 
-    const renderCell = React.useCallback(
-        (
-            item: { [key: string]: any; service: Service },
-            key: string,
-            index: number,
-            agencies: IAgency[],
-            airports: IAirport[],
-        ) => {
-            const cellValue = item[key];
-            const cellStyle = { whiteSpace: 'nowrap' };
-            if (key === 'actions') {
-                return (
-                    <div key={`${key}-${index}`} className="relative flex justify-center items-center gap-2">
-                        {actions.includes('detail') && onOpenDetailModal && setSelectedId && (
-                            <Tooltip content="Details">
-                                <button
-                                    onClick={() => {
-                                        setSelectedId(item.id.toString());
-                                        onOpenDetailModal(true);
-                                    }}
-                                    className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                                >
-                                    <EyeIcon />
-                                </button>
-                            </Tooltip>
-                        )}
-                        {actions.includes('edit') && onOpenUpdateModal && setSelectedId && (
-                            <Tooltip content="Edit">
-                                <button
-                                    onClick={() => {
-                                        setSelectedId(item.id ? item.id.toString() : item.key);
-                                        onOpenUpdateModal(true);
-                                    }}
-                                    className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                                >
-                                    <EditIcon />
-                                </button>
-                            </Tooltip>
-                        )}
-                        {actions.includes('delete') && deleteFunc && (
-                            <Tooltip color="danger" content="Delete">
-                                <button
-                                    onClick={() => deleteFunc(item.id)}
-                                    className="text-lg text-danger cursor-pointer active:opacity-50"
-                                >
-                                    <DeleteIcon />
-                                </button>
-                            </Tooltip>
-                        )}
-                        {actions.includes('active') && activeFunc && item['status'] == 0 && (
-                            <Tooltip color="primary" content="Unactive">
-                                <button
-                                    onClick={() => activeFunc(item.id)}
-                                    className="text-lg text-primary cursor-pointer active:opacity-50"
-                                >
-                                    <UnLockIcon className="size-5 text-primary" />
-                                </button>
-                            </Tooltip>
-                        )}
-                        {actions.includes('active') && activeFunc && item['status'] == 1 && (
-                            <Tooltip color="primary" content="Active">
-                                <button
-                                    onClick={() => activeFunc(item.id)}
-                                    className="text-lg text-primary cursor-pointer active:opacity-50"
-                                >
-                                    <LockIcon className="size-5 text-primary" />
-                                </button>
-                            </Tooltip>
-                        )}
-                        {actions.includes('change_password') && openChangePassword && (
-                            <Tooltip color="primary" content="Đổi mật khẩu">
-                                <button
-                                    onClick={() => openChangePassword(true)}
-                                    className="text-lg text-primary cursor-pointer active:opacity-50"
-                                >
-                                    <UserIcon className="size-5 text-primary" />
-                                </button>
-                            </Tooltip>
-                        )}
-                    </div>
-                );
-            } else if (key === 'service' && item.service) {
-                return (
-                    <Chip
-                        className="capitalize"
-                        color={serviceColor[item.service]}
-                        size="sm"
-                        variant="flat"
-                        style={cellStyle}
-                    >
-                        {configServiceName[cellValue as Service]}
-                    </Chip>
-                );
-            } else if (key === 'stt') {
-                return <span style={cellStyle}>{index + 1}</span>;
-            } else if (key === 'pnr') {
-                return (
-                    <span style={cellStyle} className="text-sky-400">
-                        {cellValue}
-                    </span>
-                );
-            } else if (key === 'agencyCode') {
-                const agency: any = agencies.find((agency) => agency.code === cellValue);
-                return <span style={cellStyle}>{agency?.name}</span>;
-            } else if (key === 'airportCode' && airports.length > 0) {
-                const airport: any = airports.find((airport) => airport.code === cellValue);
-                return <span style={cellStyle}>{airport?.name}</span>;
-            } else {
-                return <span style={cellStyle}>{cellValue}</span>;
-            }
-        },
-        [],
-    );
+    const renderActions = (item: any, key: any, index: number) => {
+        return (
+            <div key={`${key}-${index}`} className="relative flex justify-center items-center gap-2">
+                {actions.includes('detail') && onOpenDetailModal && setSelectedId && (
+                    <Tooltip content="Details">
+                        <button
+                            onClick={() => {
+                                setSelectedId(item.id.toString());
+                                onOpenDetailModal(true);
+                            }}
+                            className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                        >
+                            <EyeIcon />
+                        </button>
+                    </Tooltip>
+                )}
+                {actions.includes('edit') && onOpenUpdateModal && setSelectedId && (
+                    <Tooltip content="Edit">
+                        <button
+                            onClick={() => {
+                                setSelectedId(item.id ? item.id.toString() : item.key);
+                                onOpenUpdateModal(true);
+                            }}
+                            className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                        >
+                            <EditIcon />
+                        </button>
+                    </Tooltip>
+                )}
+                {actions.includes('delete') && deleteFunc && (
+                    <Tooltip color="danger" content="Delete">
+                        <button
+                            onClick={() => deleteFunc(item.id)}
+                            className="text-lg text-danger cursor-pointer active:opacity-50"
+                        >
+                            <DeleteIcon />
+                        </button>
+                    </Tooltip>
+                )}
+                {actions.includes('active') && activeFunc && item['status'] == 0 && (
+                    <Tooltip color="primary" content="Unactive">
+                        <button
+                            onClick={() => activeFunc(item.id)}
+                            className="text-lg text-primary cursor-pointer active:opacity-50"
+                        >
+                            <UnLockIcon className="size-5 text-primary" />
+                        </button>
+                    </Tooltip>
+                )}
+                {actions.includes('active') && activeFunc && item['status'] == 1 && (
+                    <Tooltip color="primary" content="Active">
+                        <button
+                            onClick={() => activeFunc(item.id)}
+                            className="text-lg text-primary cursor-pointer active:opacity-50"
+                        >
+                            <LockIcon className="size-5 text-primary" />
+                        </button>
+                    </Tooltip>
+                )}
+                {actions.includes('change_password') && openChangePassword && (
+                    <Tooltip color="primary" content="Đổi mật khẩu">
+                        <button
+                            onClick={() => openChangePassword(true)}
+                            className="text-lg text-primary cursor-pointer active:opacity-50"
+                        >
+                            <UserIcon className="size-5 text-primary" />
+                        </button>
+                    </Tooltip>
+                )}
+            </div>
+        );
+    };
+
+    const renderServiceCell = (item: any, cellStyle: any, cellValue: any) => {
+        return (
+            <Chip
+                className="capitalize"
+                color={serviceColor[item.service as Service]}
+                size="sm"
+                variant="flat"
+                style={cellStyle}
+            >
+                {configServiceName[cellValue as Service]}
+            </Chip>
+        );
+    };
+
+    const renderCell = (
+        item: { [key: string]: any; service: Service },
+        key: string,
+        index: number,
+        agencies: IAgency[],
+        airports: IAirport[],
+    ) => {
+        const cellValue = item[key];
+        const cellStyle = { whiteSpace: 'nowrap' };
+        if (key === 'actions') {
+            renderActions(item, key, index);
+        } else if (key === 'service' && item.service) {
+            renderServiceCell(item, cellStyle, cellValue);
+        } else if (key === 'stt') {
+            return <span style={cellStyle}>{index + 1}</span>;
+        } else if (key === 'pnr') {
+            return (
+                <span style={cellStyle} className="text-sky-400">
+                    {cellValue}
+                </span>
+            );
+        } else if (key === 'agencyCode') {
+            const agency: any = agencies.find((agency) => agency.code === cellValue);
+            return <span style={cellStyle}>{agency?.name}</span>;
+        } else if (key === 'airportCode' && airports.length > 0) {
+            const airport: any = airports.find((airport) => airport.code === cellValue);
+            return <span style={cellStyle}>{airport?.name}</span>;
+        } else {
+            return <span style={cellStyle}>{cellValue}</span>;
+        }
+    };
 
     const bottomContent = React.useMemo(() => {
         return (
@@ -295,16 +300,19 @@ export default function CustomTable({
                 </label>
             </div>
         );
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [page, pages]);
 
     useEffect(() => {
         fetchDataAgenciesForFormat();
         fetchDataAirportForFormat();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
         const pages = Math.ceil(data?.filter((item: any) => item[searchBy].includes(searchValue)).length / rowsPerPage);
         setPages(pages);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data, rowsPerPage, searchValue]);
 
     return (

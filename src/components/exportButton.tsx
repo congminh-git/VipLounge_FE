@@ -132,6 +132,7 @@ export default function ExportButton({ data, permissions }: any) {
             setHistoryViewPermission(historyView);
         }
         fetchAgenciesData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [permissions]);
 
     useEffect(() => {
@@ -140,6 +141,7 @@ export default function ExportButton({ data, permissions }: any) {
                 setAgency(agencyCode);
             }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [agencyCode]);
 
     return (
