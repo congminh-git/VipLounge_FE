@@ -3,24 +3,27 @@
 import withAuth from '@/hoc/withAuth';
 import CustomTable from '@/components/table';
 import { useEffect, useState } from 'react';
-import { activeAgencyById, deleteAgencyById, getAgencies } from '@/services/agency';
+import { activeAgencyByKey, deleteAgencyByKey, getAgencies } from '@/services/agency';
 import Swal from 'sweetalert2';
 import AddNewModal from '@/components/modals/agencyModals/addNewModal';
 import UpdateModal from '@/components/modals/agencyModals/updateModal';
 import DetailModal from '@/components/modals/agencyModals/detailModal';
+import { getAirports } from '@/services/airport';
 
 function Agencies() {
     const [agencyData, setAgencyData] = useState([]);
+    const [airportData, setAirportData] = useState([]);
     const [openAddModal, setOpenAddModal] = useState(false);
     const [openUpdateModal, setOpenUpdateModal] = useState(false);
     const [openDetailModal, setOpenDetailModal] = useState(false);
-    const [selectedId, setSelectedId] = useState('0');
+    const [selectedKey, setSelectedKey] = useState('0');
 
     const columns = [
         { name: 'STT', uid: 'stt' },
         { name: 'NAME', uid: 'name' },
         { name: 'CODE', uid: 'code' },
         { name: 'SERVICE', uid: 'service' },
+        { name: 'AIRPORT', uid: 'airportCode' },
         { name: 'ACTIONS', uid: 'actions' },
     ];
 
@@ -31,13 +34,19 @@ function Agencies() {
         setAgencyData(result);
     };
 
+    const fetchAirportsData = async () => {
+        const result = await getAirports();
+        setAirportData(result);
+    };
+
     useEffect(() => {
         fetchAgenciesData();
+        fetchAirportsData();
     }, []);
 
-    const deleteAgency = async (id: number) => {
+    const deleteAgency = async (id: string) => {
         Swal.fire({
-            title: 'Xác nhận xóa đại lý',
+            title: 'Xác nhận xóa đối tác',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -45,11 +54,10 @@ function Agencies() {
             confirmButtonText: 'Xóa',
         }).then(async (result) => {
             if (result.isConfirmed) {
-                const idStr = id.toString();
-                const response = await deleteAgencyById(idStr);
+                const response = await deleteAgencyByKey(id);
                 if (response.status === 200) {
                     Swal.fire({
-                        title: 'Xóa đại lý thành công',
+                        title: 'Xóa đối tác thành công',
                         icon: 'success',
                         showConfirmButton: false,
                         timer: 1500,
@@ -57,7 +65,7 @@ function Agencies() {
                     fetchAgenciesData();
                 } else {
                     Swal.fire({
-                        title: 'Xóa đại lý thất bại!',
+                        title: 'Xóa đối tác thất bại!',
                         icon: 'error',
                         showConfirmButton: false,
                         timer: 1500,
@@ -67,9 +75,9 @@ function Agencies() {
         });
     };
 
-    const activeAgency = async (id: number) => {
+    const activeAgency = async (id: string) => {
         Swal.fire({
-            title: 'Xác nhận khóa đại lý',
+            title: 'Xác nhận khóa đối tác',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -77,12 +85,11 @@ function Agencies() {
             confirmButtonText: 'Xác nhận',
         }).then(async (result) => {
             if (result.isConfirmed) {
-                const idStr = id.toString();
-                const response = await activeAgencyById(idStr);
+                const response = await activeAgencyByKey(id);
                 if (response.id) {
                     if (response.status === 0) {
                         Swal.fire({
-                            title: 'Mở khóa đại lý thành công',
+                            title: 'Mở khóa đối tác thành công',
                             icon: 'success',
                             showConfirmButton: false,
                             timer: 1500,
@@ -90,7 +97,7 @@ function Agencies() {
                         fetchAgenciesData();
                     } else if (response.status === 1) {
                         Swal.fire({
-                            title: 'Khóa đại lý thành công',
+                            title: 'Khóa đối tác thành công',
                             icon: 'success',
                             showConfirmButton: false,
                             timer: 1500,
@@ -110,7 +117,7 @@ function Agencies() {
     };
 
     return (
-        <div className="p-16 pt-12">
+        <div className="p-1 pt-10 sm:p-16 sm:pt-12">
             <CustomTable
                 data={agencyData}
                 columns={columns}
@@ -122,15 +129,21 @@ function Agencies() {
                 onOpenAddModal={setOpenAddModal}
                 onOpenUpdateModal={setOpenUpdateModal}
                 onOpenDetailModal={setOpenDetailModal}
-                setSelectedId={setSelectedId}
+                setSelectedId={setSelectedKey}
                 hasFilterByColumn={false}
             />
-            <AddNewModal isOpen={openAddModal} onOpenChange={setOpenAddModal} reFetchData={fetchAgenciesData} />
+            <AddNewModal
+                isOpen={openAddModal}
+                onOpenChange={setOpenAddModal}
+                reFetchData={fetchAgenciesData}
+                airports={airportData}
+            />
             <UpdateModal
                 isOpen={openUpdateModal}
                 onOpenChange={setOpenUpdateModal}
                 reFetchData={fetchAgenciesData}
-                id={selectedId}
+                agencyKey={selectedKey}
+                airports={airportData}
             />
             <DetailModal isOpen={openDetailModal} onOpenChange={setOpenDetailModal} />
         </div>

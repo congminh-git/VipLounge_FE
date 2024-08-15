@@ -66,18 +66,10 @@ export default function DetailModal({ isOpen, onOpenChange, id }: IDetailModal) 
     const [agencyCode, setAgencyCode] = useState<string>('');
     const [agencyValue, setAgencyValue] = useState<string>('');
     const [agencyCodeInvalid, setAgencyCodeInvalid] = useState<boolean>(false);
-    const [service, setService] = useState<string>('');
-    const [serviceOptionValue, setServiceOptionValue] = useState<string>('');
-    const [serviceInvalid, setServiceInvalid] = useState<boolean>(false);
-    const [serviceOption, setServiceOption] = useState<string>('');
-    const [serviceOptionInvalid, setServiceOptionInvalid] = useState<boolean>(false);
-    const [listServiceOptions, setListServiceOptions] = useState<any[]>([]);
-    const [role, setRole] = useState<string>('STAFF');
+    const [role, setRole] = useState<string>('PARTNER');
     const [roleInvalid, setRoleInvalid] = useState<boolean>(false);
     const [permission, setPermission] = useState<string[]>([]);
     const [permissionInvalid, setPermissionInvalid] = useState<boolean>(false);
-    const [disableLounge, setDisableLounge] = useState<boolean>(false);
-    const [disableConnectingFlight, setDisableConnectingFlight] = useState<boolean>(false);
 
     const fetchAgencies = async () => {
         const result = await getAgencies();
@@ -123,34 +115,13 @@ export default function DetailModal({ isOpen, onOpenChange, id }: IDetailModal) 
 
     useEffect(() => {
         const regex = /\(([^)]+)\)/;
-        if (serviceOptionValue) {
-            const match = serviceOptionValue.match(regex);
-            if (match) {
-                setServiceOption(match[1]);
-            }
-        }
         if (agencyValue) {
             const match = agencyValue.match(regex);
             if (match) {
                 setAgencyCode(match[1]);
             }
         }
-    }, [serviceOptionValue, agencyValue]);
-
-    useEffect(() => {
-        if (agencyCode) {
-            const agency: any = listAgencies.find((element: IAgency) => element.code === agencyCode);
-            if (agency) {
-                setDisableLounge(agency.service === 'master' || agency.service === 'lounge' ? false : true);
-                setDisableConnectingFlight(
-                    agency.service === 'master' || agency.service === 'connecting_flight' ? false : true,
-                );
-            } else {
-                setDisableLounge(true);
-                setDisableConnectingFlight(true);
-            }
-        }
-    }, [agencyCode]);
+    }, [agencyValue]);
 
     useEffect(() => {
         if (role && listRoles) {
@@ -162,31 +133,11 @@ export default function DetailModal({ isOpen, onOpenChange, id }: IDetailModal) 
     }, [role, listRoles]);
 
     useEffect(() => {
-        if (serviceOptionValue) {
-            const regex = /\(([^)]+)\)/;
-            const match = serviceOptionValue.match(regex);
-            if (match) setServiceOption(match[1]);
-        }
-    }, [serviceOptionValue]);
-
-    useEffect(() => {
-        if (agencyCode && listAgencies && service) {
-            const agency: any = listAgencies.find((element: IAgency) => element.code === agencyCode);
-            if (agency) {
-                console.log(agency, service, agency[service]);
-                setListServiceOptions(agency[service === 'lounge' ? 'lounges' : 'cfroms']);
-            }
-        }
-    }, [agencyCode, service, listAgencies]);
-
-    useEffect(() => {
         if (userData) {
             setEmail(userData.email);
             setFullName(userData.name);
             setPhone(userData.phone);
             setAgencyCode(userData.agencyCode);
-            setService(userData.service);
-            setServiceOption(userData.serviceOption);
             setRole(userData.roleName);
             setPermission(JSON.parse(userData.permissions));
         }
@@ -197,6 +148,7 @@ export default function DetailModal({ isOpen, onOpenChange, id }: IDetailModal) 
             <Modal
                 backdrop="opaque"
                 isOpen={isOpen}
+                placement="center"
                 onOpenChange={onOpenChange}
                 size={'3xl'}
                 classNames={{
@@ -208,8 +160,8 @@ export default function DetailModal({ isOpen, onOpenChange, id }: IDetailModal) 
                         <>
                             <ModalHeader className="flex flex-col gap-1">Thông tin chi tiết tài khoản</ModalHeader>
                             <ModalBody>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="border rounded-md p-2">
+                                <div className="grid sm:grid-cols-2 gap-4 overflow-y-auto">
+                                    <div className="sm:border rounded-md sm:p-2">
                                         <Input
                                             size={'sm'}
                                             type="email"
@@ -242,10 +194,10 @@ export default function DetailModal({ isOpen, onOpenChange, id }: IDetailModal) 
                                         />
                                         <Autocomplete
                                             key={agencyCode}
-                                            label="Đại lý"
+                                            label="Đối tác"
                                             isDisabled
                                             defaultItems={listAgencies}
-                                            errorMessage={'Chọn đại lý'}
+                                            errorMessage={'Chọn đối tác'}
                                             isInvalid={agencyCodeInvalid}
                                             className={`w-full agency-${agencyCode}`}
                                             onInputChange={setAgencyValue}
@@ -257,64 +209,8 @@ export default function DetailModal({ isOpen, onOpenChange, id }: IDetailModal) 
                                                 >{`${element.name} (${element.code})`}</AutocompleteItem>
                                             )}
                                         </Autocomplete>
-                                        <RadioGroup
-                                            isDisabled
-                                            onValueChange={setService}
-                                            value={service}
-                                            isInvalid={serviceInvalid}
-                                            label="Dịch vụ"
-                                            orientation="horizontal"
-                                        >
-                                            <Radio isDisabled value="lounge" className="mr-2">
-                                                Phòng chờ
-                                            </Radio>
-                                            <Radio isDisabled value="connecting_flight">
-                                                Nối chuyến
-                                            </Radio>
-                                        </RadioGroup>
-                                        {service && agencyCode ? (
-                                            listServiceOptions.length > 0 && listAgencies ? (
-                                                <Autocomplete
-                                                    key={serviceOption}
-                                                    label={`${
-                                                        service === 'lounge' ? 'Phòng chờ' : 'Dịch vụ nối chuyến'
-                                                    }`}
-                                                    isDisabled
-                                                    defaultItems={listServiceOptions}
-                                                    errorMessage={'Chọn dịch vụ'}
-                                                    isInvalid={serviceOptionInvalid}
-                                                    className={`w-full mt-2 service-option-${serviceOption}`}
-                                                    onInputChange={setServiceOptionValue}
-                                                    defaultSelectedKey={serviceOption}
-                                                >
-                                                    {(element: IAgency) => (
-                                                        <AutocompleteItem
-                                                            key={element.code}
-                                                        >{`${element.name} (${element.code})`}</AutocompleteItem>
-                                                    )}
-                                                </Autocomplete>
-                                            ) : (
-                                                <Autocomplete
-                                                    label={`${
-                                                        service === 'lounge' ? 'Phòng chờ' : 'Dịch vụ nối chuyến'
-                                                    }`}
-                                                    isDisabled
-                                                    errorMessage={
-                                                        service === 'lounge'
-                                                            ? 'Đại lý chưa có dịch vụ phòng chờ'
-                                                            : 'Đại lý chưa có dịch vụ nối chuyến'
-                                                    }
-                                                    isInvalid={true}
-                                                    className={`w-full mt-2 service-option-${serviceOption}`}
-                                                >
-                                                    <AutocompleteItem key={'error'}>-----</AutocompleteItem>
-                                                </Autocomplete>
-                                            )
-                                        ) : (
-                                            <></>
-                                        )}
                                     </div>
-                                    <div className="h-full flex flex-col">
+                                    <div className="h-full flex sm:flex-col">
                                         <RadioGroup
                                             isDisabled
                                             onValueChange={setRole}
@@ -329,10 +225,10 @@ export default function DetailModal({ isOpen, onOpenChange, id }: IDetailModal) 
                                             <Radio value="HDQ" className="mr-2">
                                                 HDQ
                                             </Radio>
-                                            <Radio value="STAFF">STAFF</Radio>
+                                            <Radio value="PARTNER">PARTNER</Radio>
                                         </RadioGroup>
-                                        <div className="bg-gray-50 rounded-md w-full border shadow-inner mt-2 p2 box-content flex-grow">
-                                            <div className="w-full h-full relative">
+                                        <div className="bg-gray-50 rounded-md w-full border shadow-inner mt-2 p2 box-content sm:flex-grow">
+                                            <div className="w-full h-full relative overflow-auto">
                                                 <CheckboxGroup
                                                     isDisabled
                                                     isInvalid={permissionInvalid}

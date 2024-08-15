@@ -2,8 +2,8 @@ import Link from 'next/link';
 
 function Footer() {
     return (
-        <div className="border-t bg-white p-4 sm:flex justify-between text-xs text-gray-500 fixed bottom-0 left-0 right-0">
-            <div className="flex justify-between">
+        <div className="border-t bg-white p-4 sm:flex justify-between text-xs text-gray-500 block sm:fixed sm:bottom-0 sm:left-0 sm:right-0">
+            <div className="flex sm:justify-between justify-center">
                 <div className="mr-8">
                     <span className="w-2 h-2 mr-2 inline-block rounded-full bg-gray-200"></span>
                     <span>

@@ -102,6 +102,7 @@ export default function ForgotPasswordModal({ isOpen, onOpenChange, usernameData
             <Modal
                 backdrop="opaque"
                 isOpen={isOpen}
+                placement="center"
                 onOpenChange={onOpenChange}
                 classNames={{
                     backdrop: 'bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20',
@@ -111,7 +112,7 @@ export default function ForgotPasswordModal({ isOpen, onOpenChange, usernameData
                     {(onClose) => (
                         <>
                             <ModalHeader className="flex flex-col gap-1">Quên mật khẩu</ModalHeader>
-                            <ModalBody>
+                            <ModalBody className=" overflow-scroll">
                                 <Input
                                     size={'sm'}
                                     type="text"
@@ -152,16 +153,6 @@ export default function ForgotPasswordModal({ isOpen, onOpenChange, usernameData
                                         ) : (
                                             <></>
                                         )}
-                                        <Input
-                                            size={'sm'}
-                                            type="password"
-                                            label="Mật khẩu mới"
-                                            isRequired
-                                            isInvalid={passwordInvalid}
-                                            errorMessage="Nhập mật khẩu"
-                                            value={password}
-                                            onValueChange={setPassword}
-                                        />
                                     </>
                                 ) : (
                                     <></>

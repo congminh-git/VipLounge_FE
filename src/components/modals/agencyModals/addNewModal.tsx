@@ -1,28 +1,44 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input } from '@nextui-org/react';
+import {
+    Modal,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+    Button,
+    Input,
+    Autocomplete,
+    AutocompleteItem,
+} from '@nextui-org/react';
 import { Service } from '@/types/publicTypes';
 import SelectService from '@/components/selectService';
 import { addAgency } from '@/services/agency';
 import Swal from 'sweetalert2';
+import { IAirport } from '@/types/Airport';
 
 interface IAddNewModal {
     isOpen: boolean;
     onOpenChange: (isOpen: boolean) => void;
     reFetchData: () => void;
+    airports: IAirport[];
 }
 
 interface ICreate {
     name: string;
     code: string;
     service: Service;
+    airportCode: string;
 }
 
-export default function AddNewModal({ isOpen, onOpenChange, reFetchData }: IAddNewModal) {
+export default function AddNewModal({ isOpen, onOpenChange, reFetchData, airports }: IAddNewModal) {
     const [name, setName] = useState<string>('');
     const [code, setCode] = useState<string>('');
-    const [service, setService] = useState<Service>('master');
+    const [airportCode, setAirportCode] = useState<string>('');
+    const [airportValue, setAirportValue] = useState<string>('');
+    const [airportCodeInvalid, setAirportCodeInvalid] = useState<boolean>(false);
+    const [service, setService] = useState<Service>('lounge');
     const [nameInvalid, setNameInvalid] = useState<boolean>(false);
     const [codeInvalid, setCodeInvalid] = useState<boolean>(false);
 
@@ -32,7 +48,7 @@ export default function AddNewModal({ isOpen, onOpenChange, reFetchData }: IAddN
     };
 
     const onSubmitModal = async (name: string, code: string, service: Service) => {
-        let nameInvalidBool, codeInvalidBool;
+        let nameInvalidBool, codeInvalidBool, airportCodeInvalidBool;
         if (!name || name.trim() === '') {
             nameInvalidBool = true;
             setNameInvalid(true);
@@ -47,17 +63,25 @@ export default function AddNewModal({ isOpen, onOpenChange, reFetchData }: IAddN
             codeInvalidBool = false;
             setCodeInvalid(false);
         }
+        if (!airportCode || airportCode.trim() === '' || airportCode.trim().length !== 3) {
+            airportCodeInvalidBool = true;
+            setAirportCodeInvalid(true);
+        } else {
+            airportCodeInvalidBool = false;
+            setAirportCodeInvalid(false);
+        }
 
-        if (!nameInvalidBool && !codeInvalidBool) {
+        if (!nameInvalidBool && !codeInvalidBool && !airportCodeInvalidBool) {
             const body: ICreate = {
                 name,
                 code,
                 service,
+                airportCode,
             };
             const result = await create(body);
-            if (result.id) {
+            if (result.key) {
                 Swal.fire({
-                    title: 'Thêm đại lý thành công',
+                    title: 'Thêm đối tác thành công',
                     icon: 'success',
                     showConfirmButton: false,
                     timer: 1500,
@@ -67,11 +91,11 @@ export default function AddNewModal({ isOpen, onOpenChange, reFetchData }: IAddN
                 setNameInvalid(false);
                 setCode('');
                 setCodeInvalid(false);
-                setService('master');
+                setService('lounge');
                 onOpenChange(false);
             } else {
                 Swal.fire({
-                    title: 'Thêm đại lý thất bại',
+                    title: 'Thêm đối tác thất bại',
                     text: result.response.data.message || 'Something went wrong!',
                     icon: 'error',
                     showConfirmButton: false,
@@ -81,12 +105,23 @@ export default function AddNewModal({ isOpen, onOpenChange, reFetchData }: IAddN
         }
     };
 
+    useEffect(() => {
+        const regex = /\(([^)]+)\)/;
+        if (airportValue) {
+            const match = airportValue.match(regex);
+            if (match) {
+                setAirportCode(match[1]);
+            }
+        }
+    }, [airportValue]);
+
     return (
         <>
             <Modal
                 backdrop="opaque"
                 isOpen={isOpen}
                 onOpenChange={onOpenChange}
+                placement="center"
                 classNames={{
                     backdrop: 'bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20',
                 }}
@@ -94,29 +129,43 @@ export default function AddNewModal({ isOpen, onOpenChange, reFetchData }: IAddN
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex flex-col gap-1">Thêm đại lý</ModalHeader>
+                            <ModalHeader className="flex flex-col gap-1">Thêm đối tác</ModalHeader>
                             <ModalBody>
                                 <Input
                                     size={'sm'}
                                     type="text"
-                                    label="Tên đại lý"
+                                    label="Tên đối tác"
                                     isRequired
                                     isInvalid={nameInvalid}
-                                    errorMessage="Nhập tên đại lý"
+                                    errorMessage="Nhập tên đối tác"
                                     value={name}
                                     onValueChange={setName}
                                 />
                                 <Input
                                     size={'sm'}
                                     type="text"
-                                    label="Mã đại lý"
+                                    label="Mã đối tác"
                                     isRequired
                                     isInvalid={codeInvalid}
-                                    errorMessage="Mã đại lý phải có 3 ký tự"
+                                    errorMessage="Mã đối tác phải có 3 ký tự"
                                     value={code}
                                     onValueChange={setCode}
                                 />
                                 <SelectService defaultValue={service} setData={setService} />
+                                <Autocomplete
+                                    label="Sân bay"
+                                    defaultItems={airports}
+                                    errorMessage={'Chọn sân bay'}
+                                    isInvalid={airportCodeInvalid}
+                                    className="w-full mt-2"
+                                    onInputChange={setAirportValue}
+                                >
+                                    {(element: IAirport) => (
+                                        <AutocompleteItem
+                                            key={element.code}
+                                        >{`${element.name} (${element.code})`}</AutocompleteItem>
+                                    )}
+                                </Autocomplete>
                             </ModalBody>
                             <ModalFooter>
                                 <Button color="danger" variant="light" onPress={onClose}>

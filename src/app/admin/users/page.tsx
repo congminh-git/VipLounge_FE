@@ -41,7 +41,7 @@ function Users() {
         setListAgencies(result);
     };
 
-    const deleteUser = async (id: number) => {
+    const deleteUser = async (id: string) => {
         Swal.fire({
             title: 'Xác nhận xóa user',
             icon: 'warning',
@@ -73,7 +73,7 @@ function Users() {
         });
     };
 
-    const activeUser = async (id: number) => {
+    const activeUser = async (id: string) => {
         Swal.fire({
             title: 'Xác nhận khóa user',
             icon: 'warning',
@@ -121,7 +121,7 @@ function Users() {
     }, []);
 
     return (
-        <div className="p-16 pt-12">
+        <div className="p-1 pt-10 sm:p-16 sm:pt-12">
             <CustomTable
                 data={userData}
                 columns={columns}
@@ -135,7 +135,7 @@ function Users() {
                 onOpenDetailModal={setOpenDetailModal}
                 setSelectedId={setSelectedId}
                 hasFilterByColumn={true}
-                filterByColumn={{ column: 'agencyCode', name: 'Đại lý' }}
+                filterByColumn={{ column: 'agencyCode', name: 'Đối tác' }}
                 dataOfFilter={listAgencies}
             />
             <AddNewModal isOpen={openAddModal} onOpenChange={setOpenAddModal} reFetchData={fetchUsersData} />

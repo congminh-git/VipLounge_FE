@@ -30,7 +30,18 @@ export const resetPassword = async (username: string, password: string, verifyCo
         password: password,
         verifyCode: verifyCode,
     };
-    return postRequest(url, body);
+    return putRequest(url, body);
+};
+
+export const changePassword = async (username: string, email: string, oldPassword: string, newPassword: string) => {
+    const url = `/user/change-password`;
+    const body = {
+        username: username,
+        email: email,
+        oldPassword: oldPassword,
+        newPassword: newPassword,
+    };
+    return putRequest(url, body);
 };
 
 export const getUsers = async () => {
