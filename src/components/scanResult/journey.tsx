@@ -17,12 +17,14 @@ export default function Journey({ journey, selectedSegment, successStatus }: any
             </p>
             {journey.segments.map((segment: any, segmentIndex: number) => {
                 return (
-                    <Segment
-                        segment={segment}
-                        segmentIndex={segmentIndex}
-                        status={journey.segments.length > 1 ? 1 : 0}
-                        selected={selectedSegment.key === segment.key}
-                    />
+                    <div key={`segment-${segmentIndex}`}>
+                        <Segment
+                            segment={segment}
+                            segmentIndex={segmentIndex}
+                            status={journey.segments.length > 1 ? 1 : 0}
+                            selected={selectedSegment.key === segment.key}
+                        />
+                    </div>
                 );
             })}
         </div>

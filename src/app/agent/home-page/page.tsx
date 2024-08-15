@@ -291,6 +291,7 @@ function HomePage() {
         if ((result && fullName) || (searchByPnr && pnr && fullName)) {
             handleCheck(pnr, fullName, cityPair, airline, flightNumber, flightDateNumber);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pnr, fullName, cityPair, airline, flightNumber, flightDateNumber, startScanning, searchByPnr, result]);
 
     return (

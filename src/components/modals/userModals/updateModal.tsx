@@ -234,6 +234,7 @@ export default function UpdateModal({ isOpen, onOpenChange, reFetchData, id }: I
                 setPermission(permissionNotFilter);
             }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [permissionNotFilter]);
 
     useEffect(() => {

@@ -264,6 +264,7 @@ export default function CustomTable({
             } else {
                 return <span style={cellStyle}>{cellValue}</span>;
             }
+            // eslint-disable-next-line react-hooks/exhaustive-deps
         },
         [],
     );
@@ -295,16 +296,19 @@ export default function CustomTable({
                 </label>
             </div>
         );
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [page, pages]);
 
     useEffect(() => {
         fetchDataAgenciesForFormat();
         fetchDataAirportForFormat();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
         const pages = Math.ceil(data?.filter((item: any) => item[searchBy].includes(searchValue)).length / rowsPerPage);
         setPages(pages);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data, rowsPerPage, searchValue]);
 
     return (

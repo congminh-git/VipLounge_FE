@@ -116,6 +116,7 @@ function History() {
         if (minSearchDate && maxSearchDate) {
             fetchHistorysData();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [minSearchDate, maxSearchDate]);
 
     return (

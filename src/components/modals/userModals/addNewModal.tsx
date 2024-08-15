@@ -164,6 +164,7 @@ export default function AddNewModal({ isOpen, onOpenChange, reFetchData }: IAddN
                 setPermission(permissionNotFilter);
             }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [permissionNotFilter]);
 
     const handleSubmit = async () => {
