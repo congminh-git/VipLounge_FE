@@ -35,7 +35,8 @@ function HomePage() {
     const [passenger, setPassenger] = useState<any>();
     const [journey, setJourney] = useState<any>();
     const [segment, setSegment] = useState<any>();
-    const [qrDeviceResult, setQrDeviceResult] = useState<string>('');
+    const [qrDeviceReults, setQrDeviceReults] = useState<string>('');
+    const [agencyInvalid, setAgencyInvalid] = useState<boolean>(false);
 
     const services = useSelector((state: RootState) => state.auth.service);
     const permissions = useSelector((state: RootState) => state.auth.permissions);
@@ -43,16 +44,23 @@ function HomePage() {
     const agency = useSelector((state: RootState) => state.auth.agencyCode);
 
     function barcodeAutoFocus() {
-        document.getElementById('search-by-scanning-device')?.focus();
+        const activeElement = document.activeElement;
+        if (!(activeElement && activeElement.tagName === 'INPUT')) {
+            const element = document.getElementById('search-by-scanning-device') as HTMLInputElement | null;
+            if (element) {
+                element.focus();
+                element.value = '';
+            }
+        }
     }
 
     function onChangeBarcode(event: any) {
-        setQrDeviceResult(event.target.value);
+        setQrDeviceReults(event.target.value);
     }
 
     function onKeyPressBarcode(event: any) {
         if (event.keyCode === 13) {
-            setQrDeviceResult(event.target.value);
+            setResult(event.target.value);
         }
     }
 
@@ -77,12 +85,7 @@ function HomePage() {
         flightDateNumber: string,
     ) => {
         if (!agency && !selectedAgency) {
-            Swal.fire({
-                title: 'Chưa chọn đại lý',
-                text: 'Vui lòng chọn đối tác muốn kiểm tra',
-                icon: 'error',
-            });
-            return;
+            setAgencyInvalid(true);
         }
         const body = {
             pnr,
@@ -150,6 +153,7 @@ function HomePage() {
                 showConfirmButton: false,
                 timer: 5000,
             });
+            setResult('');
         } else {
             setResult('');
             console.log('Case');
@@ -233,6 +237,7 @@ function HomePage() {
                 showConfirmButton: false,
                 timer: 5000,
             });
+            setResult('');
         } else {
             setResult('');
             console.log('Case');
@@ -246,6 +251,18 @@ function HomePage() {
 
     useEffect(() => {
         fetchAgencies();
+
+        const handleClick = (event: any) => {
+            const element = event.target;
+            if (element instanceof HTMLElement && element.tagName !== 'INPUT') {
+                barcodeAutoFocus();
+            }
+        };
+
+        document.addEventListener('click', handleClick);
+        return () => {
+            document.removeEventListener('click', handleClick);
+        };
     }, []);
 
     useEffect(() => {
@@ -264,6 +281,18 @@ function HomePage() {
             }
         }
     }, [startScanning]);
+
+    useEffect(() => {
+        if (qrDeviceReults && qrDeviceReults.length >= 48 && result.length === 0) {
+            setResult(qrDeviceReults);
+        }
+        //  else if (result.length === 48) {
+        //     const element = document.getElementById('search-by-scanning-device');
+        //     if (element instanceof HTMLInputElement) {
+        //         element.value = '';
+        //     }
+        // }
+    }, [qrDeviceReults]);
 
     useEffect(() => {
         if (result.length > 0 && result !== '') {
@@ -345,6 +374,8 @@ function HomePage() {
                                         : 'connecting_flight'
                                     : services),
                         )}
+                        isInvalid={agencyInvalid}
+                        errorMessage={'Chọn đối tác muốn kiểm tra'}
                         className="mb-2"
                         fullWidth={true}
                         onInputChange={setSelectedAgencyValue}
@@ -410,11 +441,11 @@ function HomePage() {
                     <div>
                         <input
                             id="search-by-scanning-device"
-                            type="hidden"
+                            type="text"
                             autoFocus={true}
-                            value={qrDeviceResult}
+                            // value={qrDeviceReults}
+                            className="h-0"
                             onKeyDown={onKeyPressBarcode}
-                            onBlur={barcodeAutoFocus}
                             onChange={onChangeBarcode}
                         />
                     </div>
