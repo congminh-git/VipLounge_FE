@@ -86,7 +86,7 @@ function Agencies() {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 const response = await activeAgencyByKey(id);
-                if (response.id) {
+                if (response.id || response.key) {
                     if (response.status === 0) {
                         Swal.fire({
                             title: 'Mở khóa đối tác thành công',

@@ -196,7 +196,7 @@ export default function CustomTable({
                         {actions.includes('delete') && deleteFunc && (
                             <Tooltip color="danger" content="Delete">
                                 <button
-                                    onClick={() => deleteFunc(item.id)}
+                                    onClick={() => deleteFunc(item.id?.toString() || item.key?.toString())}
                                     className="text-lg text-danger cursor-pointer active:opacity-50"
                                 >
                                     <DeleteIcon />
@@ -206,7 +206,7 @@ export default function CustomTable({
                         {actions.includes('active') && activeFunc && item['status'] == 0 && (
                             <Tooltip color="primary" content="Unactive">
                                 <button
-                                    onClick={() => activeFunc(item.id)}
+                                    onClick={() => activeFunc(item.id?.toString() || item.key?.toString())}
                                     className="text-lg text-primary cursor-pointer active:opacity-50"
                                 >
                                     <UnLockIcon className="size-5 text-primary" />
@@ -216,7 +216,7 @@ export default function CustomTable({
                         {actions.includes('active') && activeFunc && item['status'] == 1 && (
                             <Tooltip color="primary" content="Active">
                                 <button
-                                    onClick={() => activeFunc(item.id)}
+                                    onClick={() => activeFunc(item.id?.toString() || item.key?.toString())}
                                     className="text-lg text-primary cursor-pointer active:opacity-50"
                                 >
                                     <LockIcon className="size-5 text-primary" />
